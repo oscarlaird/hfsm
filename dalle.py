@@ -36,6 +36,23 @@ from evadb.functions.abstract.abstract_function import AbstractFunction
 from evadb.functions.decorators.decorators import forward, setup
 from evadb.functions.decorators.io_descriptors.data_types import PandasDataframe
 
+import hashlib
+import base64
+
+def hash_prompt_for_filename(prompt):
+    # Convert the prompt to bytes
+    prompt_bytes = prompt.encode()
+    # Create a SHA-256 hash object
+    sha256 = hashlib.sha256()
+    # Update the hash object with the bytes of the prompt
+    sha256.update(prompt_bytes)
+    # Get the hash in bytes
+    hash_bytes = sha256.digest()
+    # Encode the hash bytes using base64
+    b64_encoded = base64.b64encode(hash_bytes)
+    # Decode the base64 bytes into a string and truncate to 6 characters
+    filename = b64_encoded.decode()[:6]
+    return filename
 
 class GPTSearchFn(AbstractFunction):
     @property
@@ -60,6 +77,13 @@ class GPTSearchFn(AbstractFunction):
                 n=1,
                 size="1024x1024"
             )
+            url = img_response.data[0].url
+            fname = hash_prompt_for_filename(search_term) + '.png'
+            # save the image at url to ./dalle_images/{fname}.png
+            img_data = requests.get(url).content
+            with open(f"./dalle_images/{fname}", 'wb') as handler:
+                handler.write(img_data)
+
             # completion = await client.chat.completions.create(
                 # model="gpt-3.5-turbo",
                 # max_tokens=90,

@@ -26,6 +26,8 @@ evadb = "^0.3.9"
 # evadb = { path = "/home/oscar/evadb",  develop = true }
 flask = "^3.0.0"
 flask-cors = "^4.0.0"
+pymupdf = "^1.23.6"
+gensim = "^4.3.2"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.27.0"
